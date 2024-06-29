@@ -17,6 +17,8 @@ float f(float x) {
 vector<Vector2> points;
 vector<Vector2> coords;
 int zoom = 40;
+int moveX;
+int moveY;
 
 int main(int argc, char *argv[]) {
 
@@ -73,35 +75,58 @@ int main(int argc, char *argv[]) {
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(RAYWHITE);
-    DrawLine(0, 800, 1600, 800, BLACK); // X Axis
-    DrawLine(800, 0, 800, 1600, BLACK); // Y Axis
+    DrawLine(0 + moveX, 800 + moveY, 1600 + moveX, 800 + moveY,
+             BLACK); // X Axis
+    DrawLine(800 + moveX, 0 + moveY, 800 + moveX, 1600 + moveY,
+             BLACK); // Y Axis
 
+    // Rendering Graph
     for (int i = 0; i < points.size() - 1; i++) {
-      DrawLineEx(
-          {(points[i].x * zoom) + 800, (points[i].y * -zoom) + 800},
-          {(points[i + 1].x * zoom) + 800, (points[i + 1].y * -zoom) + 800}, 7,
-          RED);
+      DrawLineEx({(points[i].x * zoom) + 800 + moveX,
+                  (points[i].y * -zoom) + 800 + moveY},
+                 {(points[i + 1].x * zoom) + 800 + moveX,
+                  (points[i + 1].y * -zoom) + 800 + moveY},
+                 7, RED);
     }
 
     for (int i = -100; i <= 100; i++) {
-      DrawText(TextFormat("%d", i), (i * zoom) - 10 + 800, 800, 20, BLACK);
-      DrawText(TextFormat("%d", i), 800, (i * zoom) - 10 + 800, 20, BLACK);
+      DrawText(TextFormat("%d", i), (i * zoom) - 10 + 800 + moveX, 800 + moveY,
+               20,
+               BLACK); // X axis Numbers
+      DrawText(TextFormat("%d", i), 800 + moveX, (i * zoom) - 10 + 800 + moveY,
+               20,
+               BLACK); /// Y axis Numbers
     }
 
+    // Drawing rectangles
     for (auto x : coords) {
-      DrawRectanglePro(
-          {x.x * zoom + 800, 0 + 800, partition * zoom, f(x.x) * zoom},
-          {00, 00}, -180.0f, GREEN);
-      DrawRectanglePro(
-          {x.x * zoom + 800, 0 + 800, partition * zoom, f(x.x) * -zoom},
-          {00, 00}, 0.0f, GREEN);
+      DrawRectanglePro({x.x * zoom + 800 + moveX, (x.x * 0) + moveY + 0 + 800,
+                        partition * zoom, f(x.x) * zoom},
+                       {0, 0}, -180.0f, GREEN);
+      DrawRectanglePro({x.x * zoom + 800 + moveX, (x.x * 0) + moveY + 0 + 800,
+                        partition * zoom, f(x.x) * -zoom},
+                       {0, 0}, 0.0f, GREEN);
     }
+
+    // Movement
     float wheel = GetMouseWheelMove();
     if (wheel < 0) {
       zoom -= 1;
     }
     if (wheel > 0) {
       zoom += 1;
+    }
+    if (IsKeyDown(KEY_A)) {
+      moveX += 1;
+    }
+    if (IsKeyDown(KEY_D)) {
+      moveX -= 1;
+    }
+    if (IsKeyDown(KEY_W)) {
+      moveY += 1;
+    }
+    if (IsKeyDown(KEY_S)) {
+      moveY -= 1;
     }
     EndDrawing();
   }
