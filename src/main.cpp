@@ -8,7 +8,7 @@ using namespace std;
 #define precision 9999
 
 float f(float x) {
-  float y = (x+5);
+  float y = sin(x);
   if (isinf(y)) {
     return y = 0;
   }
@@ -16,6 +16,7 @@ float f(float x) {
 }
 vector<Vector2> points;
 vector<Vector2> coords;
+int zoom = 40;
 
 int main(int argc, char *argv[]) {
 
@@ -47,7 +48,7 @@ int main(int argc, char *argv[]) {
 
   do {
     if (_x < b) {
-      points.push_back({(_x * 40) + 800, (f(_x) * -40) + 800});
+      points.push_back({_x, f(_x)});
       _x = _x + _partition;
     } else {
       _end = true;
@@ -75,19 +76,33 @@ int main(int argc, char *argv[]) {
     DrawLine(0, 800, 1600, 800, BLACK); // X Axis
     DrawLine(800, 0, 800, 1600, BLACK); // Y Axis
 
-    DrawSplineLinear(points.data(), points.size(), 8.0f, RED);
-    for (int i = -20; i <= 40; i++) {
-      DrawText(TextFormat("%d", i - 20), (i * 40) - 10, 800, 20, BLACK);
-      DrawText(TextFormat("%d", i - 20), 800, (i * 40) - 10, 20, BLACK);
+    for (int i = 0; i < points.size() - 1; i++) {
+      DrawLineEx(
+          {(points[i].x * zoom) + 800, (points[i].y * -zoom) + 800},
+          {(points[i + 1].x * zoom) + 800, (points[i + 1].y * -zoom) + 800}, 7,
+          RED);
+    }
+
+    for (int i = -100; i <= 100; i++) {
+      DrawText(TextFormat("%d", i), (i * zoom) - 10 + 800, 800, 20, BLACK);
+      DrawText(TextFormat("%d", i), 800, (i * zoom) - 10 + 800, 20, BLACK);
     }
 
     for (auto x : coords) {
-      DrawRectanglePro({x.x * 40 + 800, 0 + 800, partition * 40, f(x.x) * 40},
-                       {00, 00}, -180.0f, GREEN);
-      DrawRectanglePro({x.x * 40 + 800, 0 + 800, partition * 40, f(x.x) * -40},
-                       {00, 00}, 0.0f, GREEN);
+      DrawRectanglePro(
+          {x.x * zoom + 800, 0 + 800, partition * zoom, f(x.x) * zoom},
+          {00, 00}, -180.0f, GREEN);
+      DrawRectanglePro(
+          {x.x * zoom + 800, 0 + 800, partition * zoom, f(x.x) * -zoom},
+          {00, 00}, 0.0f, GREEN);
     }
-
+    float wheel = GetMouseWheelMove();
+    if (wheel < 0) {
+      zoom -= 1;
+    }
+    if (wheel > 0) {
+      zoom += 1;
+    }
     EndDrawing();
   }
 
