@@ -19,6 +19,8 @@ vector<Vector2> coords;
 int zoom = 40;
 int moveX;
 int moveY;
+int screenX = 1600;
+int screenY = 1600;
 
 int main(int argc, char *argv[]) {
 
@@ -71,50 +73,59 @@ int main(int argc, char *argv[]) {
   cout << "Area under f(x) = sin(x): " << partition * ySum << endl;
 
   SetTraceLogLevel(LOG_ERROR);
-  InitWindow(1600, 1600, "graph");
+  InitWindow(screenX, screenY, "graph");
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(RAYWHITE);
-    DrawLine(0 + moveX, 800 + moveY, 1600 + moveX, 800 + moveY,
+    DrawLine(0 + moveX, screenY / 2 + moveY, screenX + moveX,
+             screenY / 2 + moveY,
              BLACK); // X Axis
-    DrawLine(800 + moveX, 0 + moveY, 800 + moveX, 1600 + moveY,
+    DrawLine(screenX / 2 + moveX, 0 + moveY, screenX / 2 + moveX,
+             screenY + moveY,
              BLACK); // Y Axis
 
     // Rendering Graph
     for (int i = 0; i < points.size() - 1; i++) {
-      DrawLineEx({(points[i].x * zoom) + 800 + moveX,
-                  (points[i].y * -zoom) + 800 + moveY},
-                 {(points[i + 1].x * zoom) + 800 + moveX,
-                  (points[i + 1].y * -zoom) + 800 + moveY},
+      DrawLineEx({(points[i].x * zoom) + screenX / 2 + moveX,
+                  (points[i].y * -zoom) + screenY / 2 + moveY},
+                 {(points[i + 1].x * zoom) + screenX / 2 + moveX,
+                  (points[i + 1].y * -zoom) + screenY / 2 + moveY},
                  7, RED);
     }
 
     for (int i = -100; i <= 100; i++) {
-      DrawText(TextFormat("%d", i), (i * zoom) - 10 + 800 + moveX, 800 + moveY,
-               20,
+      DrawText(TextFormat("%d", i), (i * zoom) - 10 + screenX / 2 + moveX,
+               screenY / 2 + moveY, 20,
                BLACK); // X axis Numbers
-      DrawText(TextFormat("%d", i), 800 + moveX, (i * zoom) - 10 + 800 + moveY,
-               20,
+      DrawText(TextFormat("%d", i), screenX / 2 + moveX,
+               (i * zoom) - 10 + screenY / 2 + moveY, 20,
                BLACK); /// Y axis Numbers
     }
 
     // Drawing rectangles
     for (auto x : coords) {
-      DrawRectanglePro({x.x * zoom + 800 + moveX, (x.x * 0) + moveY + 0 + 800,
-                        partition * zoom, f(x.x) * zoom},
+      DrawRectanglePro({x.x * zoom + screenX / 2 + moveX,
+                        (x.x * 0) + moveY + 0 + screenY / 2, partition * zoom,
+                        f(x.x) * zoom},
                        {0, 0}, -180.0f, GREEN);
-      DrawRectanglePro({x.x * zoom + 800 + moveX, (x.x * 0) + moveY + 0 + 800,
-                        partition * zoom, f(x.x) * -zoom},
+      DrawRectanglePro({x.x * zoom + screenX / 2 + moveX,
+                        (x.x * 0) + moveY + 0 + screenY / 2, partition * zoom,
+                        f(x.x) * -zoom},
                        {0, 0}, 0.0f, GREEN);
     }
 
     // Movement
     float wheel = GetMouseWheelMove();
-    if (wheel < 0) {
-      zoom -= 1;
+    if (zoom > 0) {
+      if (wheel < 0) {
+        zoom -= 1;
+      }
+      if (wheel > 0) {
+        zoom += 1;
+      }
     }
-    if (wheel > 0) {
-      zoom += 1;
+    else {
+        zoom += 1;
     }
     if (IsKeyDown(KEY_A)) {
       moveX += 1;
